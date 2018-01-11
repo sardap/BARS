@@ -25,21 +25,21 @@
 # Vim file artifacts
 .*.sw*
 # installed platform-specific binaries
-/bin
+fabric-Sample/bin
 .DS_Store
 .project
 
-first-network/channel-artifacts/*.tx
-first-network/channel-artifacts/*.block
-first-network/crypto-config/*
+fabric-Sample/first-network/channel-artifacts/*.tx
+fabric-Sample/first-network/channel-artifacts/*.block
+fabric-Sample/first-network/crypto-config/*
 
-chaincode-docker-devmode/myc.block
-chaincode-docker-devmode/chaincode/sacc/sacc
-chaincode-docker-devmode/chaincode/chaincode_example02/chaincode_example02
+fabric-Sample/chaincode-docker-devmode/myc.block
+fabric-Sample/chaincode-docker-devmode/chaincode/sacc/sacc
+fabric-Sample/chaincode-docker-devmode/chaincode/chaincode_example02/chaincode_example02
 
 # fabric sdk node modules
-fabcar/node_modules/
+fabric-Sample/fabcar/node_modules/
 
 # balance transfer sample
-balance-transfer/.DS_Store
-balance-transfer/node_modules/*
+fabric-Sample/balance-transfer/.DS_Store
+fabric-Sample/balance-transfer/node_modules/*
