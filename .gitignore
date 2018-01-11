@@ -43,3 +43,6 @@ fabric-Sample/fabcar/node_modules/
 # balance transfer sample
 fabric-Sample/balance-transfer/.DS_Store
 fabric-Sample/balance-transfer/node_modules/*
+
+#Keys
+fabric-Sample/fabcar/hfc-key-store
