@@ -29,7 +29,6 @@ package main
  * 2 specific Hyperledger Fabric specific libraries for Smart Contracts
  */
 import (
-	"bytes"
 	"fmt"
 	"strconv"
 
@@ -61,8 +60,6 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	if function == "queryCar" {
 	} else if function == "initLedger" {
 		return s.initLedger(APIstub)
-	} else if function == "queryAllCars" {
-		return s.queryAllCars(APIstub)
 	}
 
 	switch function {
@@ -140,49 +137,6 @@ func (s *SmartContract) verifyFile(APIstub shim.ChaincodeStubInterface, args []s
 	}
 
 	return shim.Success([]byte("FALSE " + hash + " != " + args[1]))
-}
-
-func (s *SmartContract) queryAllCars(APIstub shim.ChaincodeStubInterface) sc.Response {
-
-	startKey := "FILE0"
-	endKey := "FILE999"
-
-	resultsIterator, err := APIstub.GetStateByRange(startKey, endKey)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	defer resultsIterator.Close()
-
-	// buffer is a JSON array containing QueryResults
-	var buffer bytes.Buffer
-	buffer.WriteString("[")
-
-	bArrayMemberAlreadyWritten := false
-	for resultsIterator.HasNext() {
-		queryResponse, err := resultsIterator.Next()
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		// Add a comma before array members, suppress it for the first array member
-		if bArrayMemberAlreadyWritten == true {
-			buffer.WriteString(",")
-		}
-		buffer.WriteString("{\"Key\":")
-		buffer.WriteString("\"")
-		buffer.WriteString(queryResponse.Key)
-		buffer.WriteString("\"")
-
-		buffer.WriteString(", \"Record\":")
-		// Record is a JSON object, so we write as-is
-		buffer.WriteString(string(queryResponse.Value))
-		buffer.WriteString("}")
-		bArrayMemberAlreadyWritten = true
-	}
-	buffer.WriteString("]")
-
-	fmt.Printf("- queryAllCars:\n%s\n", buffer.String())
-
-	return shim.Success(buffer.Bytes())
 }
 
 // The main function is only relevant in unit test mode. Only included here for completeness.
