@@ -57,12 +57,10 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	// Retrieve the requested Smart Contract function and arguments
 	function, args := APIstub.GetFunctionAndParameters()
 	// Route to the appropriate handler function to interact with the ledger appropriately
-	if function == "queryCar" {
-	} else if function == "initLedger" {
-		return s.initLedger(APIstub)
-	}
 
 	switch function {
+	case "initLedger":
+		return s.initLedger(APIstub)
 	case "addFile":
 		return s.addFile(APIstub, args)
 	case "verifyFile":
@@ -70,16 +68,6 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
-}
-
-func (s *SmartContract) queryCar(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1")
-	}
-
-	carAsBytes, _ := APIstub.GetState(args[0])
-	return shim.Success(carAsBytes)
 }
 
 //@Parma
@@ -98,19 +86,7 @@ func (s *SmartContract) addFile(APIstub shim.ChaincodeStubInterface, args []stri
 	return shim.Success([]byte("ADDED: KEY:" + args[0] + " VALUE:" + args[1] + args[2] + args[3]))
 }
 
-func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
-	i := 0
-	for i < 10 {
-		fmt.Println("i is ", i)
-		//@TODO no idea why im getting addFile undfined
-		//addFile(APIstub, []string{"FILE" + strconv.Itoa(i), "0", "0", "abc"})
-		APIstub.PutState("FILE"+strconv.Itoa(i), []byte(strconv.Itoa(i)+"0"+"abc"))
-		i = i + 1
-	}
-
-	return shim.Success(nil)
-}
-
+//@Parma
 //ARGS 0 = file ID
 //ARGS 1 = hash to check
 func (s *SmartContract) verifyFile(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
@@ -137,6 +113,19 @@ func (s *SmartContract) verifyFile(APIstub shim.ChaincodeStubInterface, args []s
 	}
 
 	return shim.Success([]byte("FALSE " + hash + " != " + args[1]))
+}
+
+func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
+	i := 0
+	for i < 10 {
+		fmt.Println("i is ", i)
+		//@TODO no idea why im getting addFile undfined
+		//addFile(APIstub, []string{"FILE" + strconv.Itoa(i), "0", "0", "abc"})
+		APIstub.PutState("FILE"+strconv.Itoa(i), []byte(strconv.Itoa(i)+"0"+"abc"))
+		i = i + 1
+	}
+
+	return shim.Success(nil)
 }
 
 // The main function is only relevant in unit test mode. Only included here for completeness.
