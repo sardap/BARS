@@ -36,6 +36,8 @@ import (
 	sc "github.com/hyperledger/fabric/protos/peer"
 )
 
+const REVOKED = "Revoked"
+
 // Define the Smart Contract structure
 type SmartContract struct {
 }
@@ -65,12 +67,15 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.addFile(APIstub, args)
 	case "verifyFile":
 		return s.verifyFile(APIstub, args)
+	case "revoke":
+		return s.revoke(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
 }
 
 //@Parma
+// Args 0 = Key
 // Args 1 = Data subject ID
 // Args 2 = Data Cust ID
 // Args 3 = file Hash
@@ -81,22 +86,40 @@ func (s *SmartContract) addFile(APIstub shim.ChaincodeStubInterface, args []stri
 		return shim.Error("Incorrect number of arguments. Expecting " + strconv.Itoa(NUMBER_OF_ARGS))
 	}
 
-	APIstub.PutState(args[0], []byte(args[1]+args[2]+args[3]))
+	APIstub.PutState(args[1]+args[2]+args[0], []byte(args[1]+args[2]+args[3]))
 
 	return shim.Success([]byte("ADDED: KEY:" + args[0] + " VALUE:" + args[1] + args[2] + args[3]))
 }
 
 //@Parma
-//ARGS 0 = file ID
-//ARGS 1 = hash to check
-func (s *SmartContract) verifyFile(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-	const NUMBER_OF_ARGS = 2
+// Args 0 = Key
+// Args 1 = Data subject ID
+// Args 2 = Data Cust ID
+func (s *SmartContract) revoke(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	const NUMBER_OF_ARGS = 3
 
 	if len(args) != NUMBER_OF_ARGS {
 		return shim.Error("Incorrect number of arguments. Expecting " + strconv.Itoa(NUMBER_OF_ARGS))
 	}
 
-	hashAsBytes, err := APIstub.GetState(args[0])
+	APIstub.PutState(args[1]+args[2]+args[0], []byte(REVOKED))
+
+	return shim.Success([]byte("REVOKED " + args[0] + " Cert"))
+}
+
+//@Parma
+//ARGS 0 = file ID
+//Args 1 = Data subject ID
+//Args 2 = Data Cust ID
+//ARGS 3 = hash to check
+func (s *SmartContract) verifyFile(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	const NUMBER_OF_ARGS = 4
+
+	if len(args) != NUMBER_OF_ARGS {
+		return shim.Error("Incorrect number of arguments. Expecting " + strconv.Itoa(NUMBER_OF_ARGS))
+	}
+
+	hashAsBytes, err := APIstub.GetState(args[1] + args[2] + args[0])
 
 	if err != nil {
 		return shim.Error("error")
@@ -108,7 +131,12 @@ func (s *SmartContract) verifyFile(APIstub shim.ChaincodeStubInterface, args []s
 
 	hash := string(hashAsBytes[:len(hashAsBytes)])
 
-	if hash == args[1] {
+	if hash == args[3] {
+
+		if hash == REVOKED {
+			return shim.Success([]byte(REVOKED))
+		}
+
 		return shim.Success([]byte("TRUE"))
 	}
 
