@@ -12,9 +12,13 @@ export MSYS_NO_PATHCONV=1
 
 starttime=$(date +%s)
 
+echo "Running ./start.sh in basic-network"
+
 # launch network; create channel and join peer to channel
 cd ../basic-network
 ./start.sh
+
+echo "Done Running ./start.sh in basic-network"
 
 # Now launch the CLI container in order to install, instantiate chaincode
 # and prime the ledger with our 10 cars
@@ -33,4 +37,3 @@ printf "The 'node query.js' may be run at anytime once the user has been registe
 
 cd ../fabcar
 node enrollAdmin.js
-node registerUser.js

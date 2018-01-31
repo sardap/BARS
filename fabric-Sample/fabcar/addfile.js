@@ -13,6 +13,8 @@ var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
 var os = require('os');
+var commandLineArgs = process.argv.slice(2);
+var user_name = commandLineArgs[0]
 
 //
 var fabric_client = new Fabric_Client();
@@ -43,13 +45,15 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	fabric_client.setCryptoSuite(crypto_suite);
 
 	// get the enrolled user from persistence, this user will sign all requests
-	return fabric_client.getUserContext('user1', true);
+	return fabric_client.getUserContext(user_name, true);
+
 }).then((user_from_store) => {
+
 	if (user_from_store && user_from_store.isEnrolled()) {
-		console.log('Successfully loaded user1 from persistence');
+		console.log('Successfully loaded '+user_name+' from persistence');
 		member_user = user_from_store;
 	} else {
-		throw new Error('Failed to get user1.... run registerUser.js');
+		throw new Error('Failed to get '+user_name+'.... run registerUser.js');
 	}
 
 	// get a transaction id object based on the current user assigned to fabric client
@@ -59,7 +63,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	
 	var commandLineArgs = process.argv.slice(2);
 
-	const hash = md5File.sync(commandLineArgs[0])
+	const hash = md5File.sync(commandLineArgs[1])
 
 	console.log(hash)
 
@@ -70,7 +74,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		//targets: let default to the peer assigned to the client
 		chaincodeId: 'fabcar',
 		fcn: 'addFile',
-		args: [commandLineArgs[0], commandLineArgs[1], commandLineArgs[2], hash],
+		args: [commandLineArgs[1], commandLineArgs[2], commandLineArgs[3], hash],
 		chainId: 'mychannel',
 		txId: tx_id
 	};

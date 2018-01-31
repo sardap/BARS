@@ -13,6 +13,8 @@ var Fabric_Client = require('fabric-client');
 var path = require('path');
 var util = require('util');
 var os = require('os');
+var commandLineArgs = process.argv.slice(2);
+var user_name = commandLineArgs[0]
 
 //
 var fabric_client = new Fabric_Client();
@@ -42,7 +44,9 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 
 	// get the enrolled user from persistence, this user will sign all requests
 	return fabric_client.getUserContext('user1', true);
+	
 }).then((user_from_store) => {
+
 	if (user_from_store && user_from_store.isEnrolled()) {
 		console.log('Successfully loaded user1 from persistence');
 		member_user = user_from_store;
@@ -51,8 +55,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 	}
 
 	var commandLineArgs = process.argv.slice(2);
-
-	const hash = md5File.sync(commandLineArgs[0])
+	const hash = md5File.sync(commandLineArgs[1])
 
 	// queryCar chaincode function - requires 1 argument, ex: args: ['CAR4'],
 	// queryAllCars chaincode function - requires no arguments , ex: args: [''],
@@ -60,11 +63,12 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 		//targets : --- letting this default to the peers assigned to the channel
 		chaincodeId: 'fabcar',
 		fcn: 'verifyFile',
-		args: [commandLineArgs[0], commandLineArgs[1], commandLineArgs[2], commandLineArgs[1] + commandLineArgs[2] +  hash]
+		args: [commandLineArgs[1], commandLineArgs[2], commandLineArgs[3], commandLineArgs[2] + commandLineArgs[3] +  hash]
 	};
 
 	// send the query proposal to the peer
 	return channel.queryByChaincode(request);
+
 }).then((query_responses) => {
 	console.log("Query has completed, checking results");
 	// query_responses could have more than one  results if there multiple peers were used as targets

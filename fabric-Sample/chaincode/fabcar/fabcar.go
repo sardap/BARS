@@ -91,6 +91,25 @@ func (s *SmartContract) addFile(APIstub shim.ChaincodeStubInterface, args []stri
 	return shim.Success([]byte("ADDED: KEY:" + args[0] + " VALUE:" + args[1] + args[2] + args[3]))
 }
 
+/*
+func addFile(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	const number_of_args = 6
+
+	if len(args) != number_of_args {
+		return shim.Error("Incorrect number of arguments. Expecting " + strconv.Itoa(number_of_args))
+	}
+
+	key = args[2]
+	dataSubjectId = args[3]
+	dataCustId = args[4]
+	fileHash = args[5]
+
+	APIstub.PutState(dataSubjectId+dataCustId+key, []byte(dataSubjectId+dataCustId+fileHash))
+
+	return shim.Success([]byte("ADDED: KEY:" + key + " VALUE:" + dataSubjectId + dataCustId + fileHash))
+}
+*/
+
 //@Parma
 // Args 0 = Key
 // Args 1 = Data subject ID

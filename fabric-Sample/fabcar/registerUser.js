@@ -21,6 +21,8 @@ var fabric_ca_client = null;
 var admin_user = null;
 var member_user = null;
 var store_path = path.join(__dirname, 'hfc-key-store');
+var commandLineArgs = process.argv.slice(2);
+var user_name = commandLineArgs[0]
 console.log(' Store path:'+store_path);
 
 // create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
@@ -43,6 +45,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 
     // first check to see if the admin is already enrolled
     return fabric_client.getUserContext('admin', true);
+
 }).then((user_from_store) => {
     if (user_from_store && user_from_store.isEnrolled()) {
         console.log('Successfully loaded admin from persistence');
@@ -53,23 +56,28 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 
     // at this point we should have the admin user
     // first need to register the user with the CA server
-    return fabric_ca_client.register({enrollmentID: 'user1', affiliation: 'org1.department1'}, admin_user);
+    return fabric_ca_client.register({enrollmentID: user_name, affiliation: 'org1.department1'}, admin_user);
+
 }).then((secret) => {
     // next we need to enroll the user with CA server
-    console.log('Successfully registered user1 - secret:'+ secret);
+    console.log('Successfully registered '+user_name+' - secret:'+ secret);
 
-    return fabric_ca_client.enroll({enrollmentID: 'user1', enrollmentSecret: secret});
+    return fabric_ca_client.enroll({enrollmentID: user_name, enrollmentSecret: secret});
+    
 }).then((enrollment) => {
-  console.log('Successfully enrolled member user "user1" ');
+  console.log('Successfully enrolled member user "'+user_name+'" ');
+
   return fabric_client.createUser(
-     {username: 'user1',
+     {username: user_name,
      mspid: 'Org1MSP',
      cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
      });
+
 }).then((user) => {
      member_user = user;
 
      return fabric_client.setUserContext(member_user);
+
 }).then(()=>{
      console.log('User1 was successfully registered and enrolled and is ready to intreact with the fabric network');
 
