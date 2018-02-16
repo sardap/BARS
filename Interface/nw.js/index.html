@@ -1,0 +1,138 @@
+<!doctype>
+<html>
+    
+    <head>
+        <link rel="stylesheet" type="text/css" href="style/main.css">
+        <link rel="stylesheet" type="text/css" href="style/upload.css">
+        <link rel="stylesheet" type="text/css" href="style/result.css">
+    </head>
+
+    <body>
+        <h1>Verfiy Document</h1>
+
+        <div class="tabcontent">
+            <p>Uni</p>
+            <select id="uniSelector">
+                <option value="Top teir Fake uni">pigburnt</option>
+                <option value="UOFT">UOFT</option>
+            </select>
+
+            <p>Student ID</p>            
+            <input type="number" id="studentID"/>
+
+            <p>Certiface ID</p>
+            <input type="number" id="documentID"/>
+
+            
+            <div id="holder">
+                <p>Drag certificate here to verify</p>
+            </div>
+            
+            <image id="resultImage" src="images/file.png" align="left" /> <p id="resultSubititle"></p>
+
+        </div>
+        
+
+    </body>
+
+    <script type="text/javascript">
+
+        /* GLOBALS */
+        const md5File = require('md5-file')
+        var Web3 = require('web3');
+
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+
+        function getContractAddress(uniName){
+            
+            //@ToDo This is a hack move to some server or some shit
+            switch(uniName){
+                case "Top teir Fake uni" :
+                    return "0x20d66bf2eea29cfca40d0d9e648674ce19a5b56f";
+                case "UOFT" : 
+                    return "0xc177f4e4fc21c39179123f32b33753b9b3b15f63";
+            }
+        }
+
+        /* GLOBALS */
+
+        function genreateHash(filePath){
+            var hash = md5File.sync(filePath)
+
+            return hash;
+        }
+
+        function resetResult(){
+            document.getElementById("resultImage").src="images/file.png";        
+            document.getElementById("resultSubititle").innerText = "Upload a certiface to vaildate";  
+        }
+
+        function verfiy(filePath) {
+        
+            const contractAddress = getContractAddress(document.getElementById("uniSelector").value);
+            const studentID = parseInt(document.getElementById("studentID").value);
+            const docID = parseInt(document.getElementById("documentID").value);
+            var abi = [{"constant":true,"inputs":[],"name":"returnTen","outputs":[{"name":"","type":"int256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"studentID","type":"uint32"},{"name":"documentId","type":"uint16"}],"name":"getValue","outputs":[{"name":"result","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"studentID","type":"uint32"},{"name":"documentId","type":"uint16"},{"name":"value","type":"string"}],"name":"add","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}];
+
+            var vaildcertsContract = web3.eth.contract(abi);
+            var vaildcertsContractInstance = vaildcertsContract.at(contractAddress);
+            var contractResult = vaildcertsContractInstance.getValue(studentID, docID);
+
+            var hash = genreateHash(filePath);
+
+            if(contractResult == "REVOKED"){
+                document.getElementById("resultImage").src ="images/REVOKED.png";        
+                document.getElementById("resultSubititle").innerText = "Certifacte has been revoked";            
+            } else if (contractResult == "") {
+                document.getElementById("resultImage").src="images/EntryMissing.png";        
+                document.getElementById("resultSubititle").innerText = "Certifacte cannot be found with given studentID and documentID";  
+            } else if (contractResult == hash) {
+                document.getElementById("resultImage").src="images/Match.png";        
+                document.getElementById("resultSubititle").innerText = "Certifacte is a match and vaild";  
+            } else {
+                document.getElementById("resultImage").src="images/InvaildMatch.png";        
+                document.getElementById("resultSubititle").innerText = "Certifacte is a NOT a match and is invaild";  
+            }
+        }
+
+        function main(){
+
+            window.resizeTo(800, 600);
+
+            window.addEventListener("dragover",function(e){
+                e = e || event;
+                e.preventDefault();
+            }, false);
+
+            window.addEventListener("drop",function(e){
+                e = e || event;
+                e.preventDefault();
+            }, false);
+
+            holder.ondrop = function (e) {
+                e.preventDefault();
+
+                const file = e.dataTransfer.files[0];
+
+                verfiy(e.dataTransfer.files[0].path);
+
+                return false;
+            };
+
+            var activities = document.getElementById("uniSelector");
+
+            activities.addEventListener("change", function() {
+                resetResult();
+            });
+        }
+
+        main();
+
+    </script>
+
+</html>

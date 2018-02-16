@@ -1,0 +1,11 @@
+{
+    "name": "BARS Uni uploader",
+    "main": "index.html",
+    "dependencies": {
+        "bignumber": "^1.1.0",
+        "md5-file": "^3.2.3",
+        "sha256": "^0.2.0",
+        "sjcl": "^1.0.7",
+        "web3": "github:ethereum/web3.js"
+    }
+}

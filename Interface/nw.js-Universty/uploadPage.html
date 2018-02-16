@@ -1,0 +1,148 @@
+<!doctype>
+<html>
+    
+    <head>
+        <link rel="stylesheet" type="text/css" href="style/main.css">
+        <link rel="stylesheet" type="text/css" href="style/upload.css">
+        <link rel="stylesheet" type="text/css" href="style/result.css">
+    </head>
+
+    <body>
+        <h1>Upload a document</h1>
+
+        <div class="tab">
+            <button class="tablinks" onclick="openForm(event, 'upload')">Upload</button>
+            <button class="tablinks" onclick="openForm(event, 'revoke')">Revoke</button>
+        </div>
+
+        <div id="upload" class="tabcontent">
+            <h2>Upload certiface</h2>
+            
+            <p>Contract Address</p>
+            <input type="text" id="contractAddressUpload"/>
+
+            <p>Student ID</p>            
+            <input type="number" id="studentIDUpload"/>
+
+            <p>Certiface ID</p>
+            <input type="number" id="documentIDUpload"/>
+
+            <div id="holder">
+                <p class="center_text" >Drag certificate to upload</p>
+            </div>        
+        </div>
+
+        <div id="revoke" class="tabcontent">
+            <h2>Revoke certiface</h2>
+
+            <p>Contract Address</p>
+            <input type="text" id="contractAddressRevoke"/>
+
+            <p>Student ID</p>            
+            <input type="number" id="studentIDRevoke"/>
+
+            <p>Certiface ID</p>
+            <input type="number" id="documentIDRevoke"/>
+
+            <input type="submit" value="Submit" onclick="revokeFile()">
+        </div>
+
+        <image id="resultImage" src="images/file.png" align="left" /> <p id="resultSubititle"></p>
+
+    </body>
+
+    <script type="text/javascript">
+
+        /* GLOBALS */
+        const md5File = require('md5-file')
+        var Web3 = require('web3');
+        const abi = [{"constant":true,"inputs":[{"name":"studentIDUpload","type":"uint32"},{"name":"documentIDUpload","type":"uint16"}],"name":"getValue","outputs":[{"name":"result","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"studentIDUpload","type":"uint32"},{"name":"documentIDUpload","type":"uint16"},{"name":"value","type":"string"}],"name":"add","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"studentIDUpload","type":"uint32"},{"name":"documentIDUpload","type":"uint16"}],"name":"revoke","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}];
+
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+        
+        /* END OF GLOBALS */
+
+        function openForm(evt, formName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            tablinks = document.getElementsByClassName("tablinks");
+
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            document.getElementById(formName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        function genreateHash(filePath){
+            var hash = md5File.sync(filePath)
+
+            return hash;
+        }
+
+        function addFile(filePath){ 
+            const contractAddressUpload = document.getElementById("contractAddressUpload").value;
+            const studentIDUpload = parseInt(document.getElementById("studentIDUpload").value);
+            const docID = parseInt(document.getElementById("documentIDUpload").value);
+
+            var hash = genreateHash(filePath);
+
+            var vaildcertsContract = web3.eth.contract(abi);
+            var vaildcertsContractInstance = vaildcertsContract.at(contractAddressUpload);
+            var contractResult = vaildcertsContractInstance.add(studentIDUpload, docID, hash);
+
+            document.getElementById("resultImage").src="images/Match.png";
+            document.getElementById("resultSubititle").innerText="Trasncation submited ID = " + contractResult;                
+        }
+
+        function revokeFile(){
+            const contractAddressUpload = document.getElementById("contractAddressRevoke").value;
+            const studentIDUpload = parseInt(document.getElementById("studentIDRevoke").value);
+            const docID = parseInt(document.getElementById("documentIDRevoke").value);
+
+            var vaildcertsContract = web3.eth.contract(abi);
+            var vaildcertsContractInstance = vaildcertsContract.at(contractAddressUpload);
+            var contractResult = vaildcertsContractInstance.revoke(studentIDUpload, docID);
+
+            document.getElementById("resultImage").src ="images/REVOKED.png";        
+            document.getElementById("resultSubititle").innerText="Trasncation submited ID = " + contractResult;
+        }
+
+        function main(){
+            window.resizeTo(800, 600);
+
+            window.addEventListener("dragover",function(e){
+                e = e || event;
+                e.preventDefault();
+            }, false);
+
+            window.addEventListener("drop",function(e){
+                e = e || event;
+                e.preventDefault();
+            }, false);
+
+            holder.ondrop = function (e) {
+                e.preventDefault();
+
+                addFile(e.dataTransfer.files[0].path);
+
+                return false;
+            };
+        }
+
+        main();
+
+    </script>
+
+</html>

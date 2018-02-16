@@ -1,0 +1,60 @@
+* {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+html, body {
+    height: 100%;
+}
+
+/* Style the tab content */
+.tabcontent {
+    padding: 12px 12px;
+    border: 1px solid #ccc;
+    height: 375px;
+}
+
+
+html {
+    display: table;
+    margin: auto;
+}
+
+body {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+p {
+    margin: 1px;
+}
+
+#login {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+#login * {
+    margin: 0px
+}
+
+#login h2 {
+    text-align: left;
+}
+
+#login p {
+    margin: 0px
+}
+
+#login input {
+    margin: 5px
+}
+
+#holder { 
+    border: 10px dashed #ccc; 
+    width: 100px; 
+    height: 100px; 
+}
+
+#holder.hover { 
+    border: 10px dashed #333; 
+}

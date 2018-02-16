@@ -1,0 +1,77 @@
+<!doctype>
+<html>
+    
+    <head>
+        <link rel="stylesheet" type="text/css" href="style/main.css">
+    </head>
+
+    <body>
+        <h1>University cert uploader</h1>
+
+        <div id="login">
+            <h2>Login</h2>
+
+            <p>Acount Number</p>
+            <input type="number" id="adddressInput" />
+            
+            <p>Password</p>
+            <input type="password" id="passwordInput" />
+            
+            <input type="button" value="Submit" onclick="login()">
+        </div>
+
+    </body>
+
+    <script type="text/javascript">
+
+        /* GLOBALS */
+        var Web3 = require('web3');
+
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+        
+        /* END OF GLOBALS */
+
+        function login(filePath){
+            const duration = 300;
+            var address = document.getElementById("adddressInput").value;            
+            var password = document.getElementById("passwordInput").value;
+
+            if(address == "" || password == ""){
+                alert("please fill password and account number");
+                return;
+            }
+
+            try{
+                var loginResult = web3.personal.unlockAccount(web3.eth.accounts[parseInt(address)], password, 300);
+                web3.eth.defaultAccount = web3.eth.accounts[address];
+                document.location.href = "uploadPage.html";
+            }catch(err){
+                alert(err)
+            }
+                
+        }
+
+        function main(){
+            window.resizeTo(800, 600);
+
+            window.addEventListener("dragover",function(e){
+                e = e || event;
+                e.preventDefault();
+            }, false);
+
+            window.addEventListener("drop",function(e){
+                e = e || event;
+                e.preventDefault();
+            }, false);
+        }
+
+        main();
+
+    </script>
+
+</html>

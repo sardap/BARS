@@ -1,0 +1,20 @@
+h1 {
+    margin: 0px;
+}
+
+#upload {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+#upload p {
+    margin: 5px;
+}
+
+#holder {
+    margin: 5px;
+}
+
+.center_text {
+    text-align: center;   
+}

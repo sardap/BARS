@@ -1,0 +1,12 @@
+html {
+    display: grid;
+    margin: auto;
+}
+
+#resultImage {
+    align-self: center;
+    margin:auto;
+    text-align:left;
+    float: left;
+    height: 100px
+}
