@@ -19,7 +19,7 @@ contract VaildCerts {
     }    
 
     // https://ethereum.stackexchange.com/questions/8346/convert-address-to-string
-    function toAsciiString(address x) returns (string) {
+    function toAsciiString(address x) private returns (string) {
         bytes memory s = new bytes(40);
         for (uint i = 0; i < 20; i++) {
             byte b = byte(uint8(uint(x) / (2**(8*(19 - i)))));
@@ -31,7 +31,7 @@ contract VaildCerts {
         return string(s);
     }
 
-    function char(byte b) returns (byte c) {
+    function char(byte b) private returns (byte c) {
         if (b < 10) return byte(uint8(b) + 0x30);
         else return byte(uint8(b) + 0x57);
     }
@@ -67,7 +67,7 @@ contract VaildCerts {
         delete editors[toRemove];
     }
 
-    function add(uint32 studentID, uint16 documentId, string hash) checkIsEditor public {
+    function addHash(uint32 studentID, uint16 documentId, string hash) checkIsEditor public {
         map[studentID][documentId] = certData(msg.sender, hash);
     }
     
@@ -80,4 +80,3 @@ contract VaildCerts {
     }
     
 }
- 
