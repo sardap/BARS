@@ -13,6 +13,7 @@
         <div class="tab">
             <button class="tablinks" onclick="openForm(event, 'upload')">Upload</button>
             <button class="tablinks" onclick="openForm(event, 'revoke')">Revoke</button>
+            <button class="tablinks" onclick="openForm(event, 'editor')">Add editor</button>
         </div>
 
         <div id="upload" class="tabcontent">
@@ -47,16 +48,31 @@
             <input type="submit" value="Submit" onclick="revokeFile()">
         </div>
 
+        <div id="editor" class="tabcontent">
+            <h2>Add editor</h2>
+
+            <p>Contract Address</p>
+            <input type="text" id="contractAddressEditor"/>
+
+            <p>Address of new Editor</p>            
+            <input type="text" id="editorAdreess"/>
+
+            <input type="submit" value="Submit" onclick="revokeFile()">
+        </div>
+
+
         <image id="resultImage" src="images/file.png" align="left" /> <p id="resultSubititle"></p>
 
     </body>
 
     <script type="text/javascript">
 
+        //0x244e068405fb0e7796a99c77558c247e1f0c0730 
+
         /* GLOBALS */
         const md5File = require('md5-file')
         var Web3 = require('web3');
-        const abi = [{"constant":true,"inputs":[{"name":"studentIDUpload","type":"uint32"},{"name":"documentIDUpload","type":"uint16"}],"name":"getValue","outputs":[{"name":"result","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"studentIDUpload","type":"uint32"},{"name":"documentIDUpload","type":"uint16"},{"name":"value","type":"string"}],"name":"add","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"studentIDUpload","type":"uint32"},{"name":"documentIDUpload","type":"uint16"}],"name":"revoke","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}];
+        const abi = [{"constant":false,"inputs":[{"name":"toRemove","type":"string"}],"name":"removeEditor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"studentID","type":"uint32"},{"name":"documentId","type":"uint16"},{"name":"hash","type":"string"}],"name":"add","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"x","type":"address"}],"name":"toAsciiString","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"b","type":"bytes1"}],"name":"char","outputs":[{"name":"c","type":"bytes1"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"studentID","type":"uint32"},{"name":"documentId","type":"uint16"}],"name":"revoke","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"toCheck","type":"string"}],"name":"isEditor","outputs":[{"name":"result","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"studentID","type":"uint32"},{"name":"documentId","type":"uint16"}],"name":"getHash","outputs":[{"name":"result","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"isEditor","outputs":[{"name":"result","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"toAdd","type":"string"}],"name":"addEditor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}];
 
         if (typeof web3 !== 'undefined') {
             web3 = new Web3(web3.currentProvider);
@@ -100,7 +116,7 @@
 
             var vaildcertsContract = web3.eth.contract(abi);
             var vaildcertsContractInstance = vaildcertsContract.at(contractAddressUpload);
-            var contractResult = vaildcertsContractInstance.add(studentIDUpload, docID, hash);
+            var contractResult = vaildcertsContractInstance.addHash(studentIDUpload, docID, hash);
 
             document.getElementById("resultImage").src="images/Match.png";
             document.getElementById("resultSubititle").innerText="Trasncation submited ID = " + contractResult;                
@@ -117,6 +133,10 @@
 
             document.getElementById("resultImage").src ="images/REVOKED.png";        
             document.getElementById("resultSubititle").innerText="Trasncation submited ID = " + contractResult;
+        }
+
+        function addEditor(){
+
         }
 
         function main(){
